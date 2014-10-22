@@ -44,5 +44,9 @@ Temporary Items
 
 # custom
 .opensdf
+Debug/*
+Komiwojazer/Debug/*
 
 *.opensdf
+*.pdb
+*.exe
