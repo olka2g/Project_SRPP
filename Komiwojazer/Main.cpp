@@ -1,9 +1,9 @@
+#include "FileManager.h"
+#include "DataTypes.h"
 
 int main()
 {
-
-	//chooseFile();
-	//loadFile();
+	loadFile(chooseFile());
 	//findPath();
 	//showResults();
 
