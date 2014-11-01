@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Algorithms">
+      <UniqueIdentifier>{8cc83fd9-3db1-4a5b-bbc8-a60a40ad61d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Algorithms">
+      <UniqueIdentifier>{fb9b246f-e470-462d-9ccf-74e9a0a93136}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -21,6 +27,12 @@
     <ClCompile Include="FileManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AlgorithmController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GRASP.cpp">
+      <Filter>Source Files\Algorithms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileManager.h">
@@ -28,6 +40,12 @@
     </ClInclude>
     <ClInclude Include="DataTypes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AlgorithmController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GRASP.h">
+      <Filter>Header Files\Algorithms</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
