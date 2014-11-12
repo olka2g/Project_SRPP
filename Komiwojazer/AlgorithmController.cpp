@@ -148,4 +148,7 @@ Solution getRandomSolution(CitiesData cd){
 
 	return s;
 }
+
+
+
 #pragma endregion
