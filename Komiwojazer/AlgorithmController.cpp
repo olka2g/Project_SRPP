@@ -20,24 +20,46 @@ float distanceBetween(City c1, City c2)
 	return result;
 }
 
-float getRoutesLength(Solution solution) // TODO: implement
+
+float getSingleRouteLength(Route route)
+{
+	float route_length = 0;
+
+	// For each city on route
+	for (int j = 1; j < route.num_cities; j++)
+	{
+		route_length +=
+			distanceBetween(
+			route.cities[j-1],
+			route.cities[j]
+		);
+	}
+
+	return route_length;
+}
+
+bool AreSame(Route route1, Route route2)
+{
+	if (route1.num_cities != route2.num_cities)
+		return false;
+
+	for (int i=0; i<route1.num_cities; i++)
+	{
+		if (route1.cities[i].id != route2.cities[i].id)
+			return false;
+	}
+
+	return true;
+}
+
+float getRoutesLength(Solution solution)
 {
 	float sum = 0;
 
 	// For each route
 	for (int i = 0; i < solution.num_routes; i++)
 	{
-		float route_length = 0;
-
-		// For each city on route
-		for (int j = 1; j < solution.routes[i].num_cities; j++)
-		{
-			route_length +=
-				distanceBetween(
-				solution.routes[i].cities[j-1],
-				solution.routes[i].cities[j]
-			);
-		}
+		float route_length = getSingleRouteLength(solution.routes[i]);
 
 		sum += route_length;
 	}
