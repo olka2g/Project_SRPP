@@ -1,6 +1,8 @@
 #pragma once
 #include "AlgorithmController.h"
 #include "DataTypes.h"
+#include "NearestNeighbour.h"
+
 #include <stdlib.h>
 #include <vector>
 

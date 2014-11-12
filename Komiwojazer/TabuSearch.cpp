@@ -20,22 +20,7 @@ bool shouldStop(int iteration)
 	return (iteration < MAX_ITERATIONS);
 }
 
-City getNeighbour(CitiesData area, City city)
-{
-	City nearest = area.cities[0];
-	float distance = distanceBetween(city, nearest);
 
-	for (int i = 1; i<area.count; i++)
-	{
-		if (distanceBetween(city, area.cities[i]) < distance)
-		{
-			distance = distanceBetween(city, area.cities[i]);
-			nearest = area.cities[i];
-		}
-	}
-
-	return nearest;
-}
 
 SolutionCandidate swapCitiesIn(Solution solution, City city1, City city2)
 {
@@ -157,6 +142,8 @@ void updateTabu(TabuItem* tabuList, int tabuSize, SolutionCandidate baseSolution
 }
 
 
+
+
 Solution Tabu_findPath(CitiesData cities)
 {
 	int tabuSize = TABU_DURATION_TIME * 2;
@@ -164,7 +151,10 @@ Solution Tabu_findPath(CitiesData cities)
 	TabuItem* tabuList = (TabuItem*) malloc(sizeof(TabuItem)*tabuSize);
 	std::vector<SolutionCandidate> neighbourhood;
 
-	Solution baseSolution = getRandomSolution(cities);
+	Solution baseSolution = getNearestNeighbourSolution(cities);
+	/////DEBUG
+	printResults(baseSolution);
+	///////////////
 	Solution bestSolution = baseSolution;
 	float bestCost = getRoutesLength(bestSolution);
 	SolutionCandidate baseSolutionCandidate;
