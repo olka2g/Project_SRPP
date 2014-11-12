@@ -3,7 +3,8 @@
 #include <vector>
 
 Solution findPath(CitiesData cities){
-	return GRASP_findPath(cities);
+	//return GRASP_findPath(cities);
+	return Tabu_findPath(cities);
 }
 
 #pragma region functions common for all algorithms

@@ -4,7 +4,7 @@
 typedef struct TabuItem
 {
 	Route tabuRoute;
-	int timeLeft;
+	int iterationLeft;
 } TabuItem;
 
 
@@ -66,6 +66,8 @@ SolutionCandidate swapCitiesIn(Solution solution, City city1, City city2)
 		if (newSolution.numberOfModifications == 2)
 			break;
 	}
+
+	return newSolution;
 }
 
 Route getLongestRouteIn(Solution solution, int skipFirstLongest = 0)
@@ -119,7 +121,7 @@ SolutionCandidate getBestSolution(std::vector<SolutionCandidate> neighbourhood, 
 	SolutionCandidate bestCandidate = neighbourhood[0];
 	float lowestCost = getRoutesLength(bestCandidate.solution);
 
-	for (int i=1; i<neighbourhood.size; i++)
+	for (int i=1; i<neighbourhood.size(); i++)
 	{
 		if (getRoutesLength(neighbourhood[i].solution) < lowestCost)
 		{
@@ -138,12 +140,19 @@ void updateTabu(TabuItem* tabuList, int tabuSize, SolutionCandidate baseSolution
 {
 	for (int i=0; i<tabuSize; i++)
 	{
-		tabuList[i].timeLeft--;
+		tabuList[i].iterationLeft--;
 	}
 
 	for (int i=0; i<tabuSize; i++)
 	{
-		if (tabuList[i].timeLeft <= 0)
+		if (tabuList[i].iterationLeft <= 0)
+		{
+			if (baseSolutionCandidate.numberOfModifications > 0)
+			{
+				tabuList[i].tabuRoute = baseSolutionCandidate.modifiedRoutes[--baseSolutionCandidate.numberOfModifications];
+				tabuList[i].iterationLeft = TABU_DURATION_TIME;
+			}
+		}
 	}
 }
 
@@ -166,6 +175,7 @@ Solution Tabu_findPath(CitiesData cities)
 		generateNeighbourhood(baseSolution, neighbourhood, cities);
 		baseSolutionCandidate = getBestSolution(neighbourhood, tabuList, tabuSize);
 		updateTabu(tabuList, tabuSize, baseSolutionCandidate);
+		bestSolution = getBetterSolution(baseSolutionCandidate.solution, bestSolution);
 		i++;
 	}
 

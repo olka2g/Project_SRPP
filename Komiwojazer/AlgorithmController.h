@@ -1,6 +1,7 @@
 #pragma once
 #include "DataTypes.h"
 #include "GRASP.h"
+#include "TabuSearch.h"
 
 #include <stdio.h>
 #include <math.h>
