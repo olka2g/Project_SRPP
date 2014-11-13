@@ -27,7 +27,6 @@ City getCity(const CitiesData& area, int id)
 	return nullCity;
 }
 
-/////s¹siad samego siebie
 City getNeighbour(const CitiesData& area, City city)
 {
 	City nearest;
@@ -35,7 +34,9 @@ City getNeighbour(const CitiesData& area, City city)
 
 	for (int i = 1; i<area.count; i++)
 	{
-		if (area.cities[i].id > 0 && area.cities[i].id != city.id && distanceBetween(city, area.cities[i]) < distance)
+		if (area.cities[i].id > 0)
+			if(area.cities[i].id != city.id)
+				if(distanceBetween(city, area.cities[i]) < distance)
 		{
 			distance = distanceBetween(city, area.cities[i]);
 			nearest = area.cities[i];
@@ -62,9 +63,21 @@ void insertRouteIn(Solution& solution, City* cityBuffer, int bufferCount)
 
 }
 
-Solution getNearestNeighbourSolution(CitiesData area, int initialID)
+Solution getNearestNeighbourSolution(CitiesData& initArea, int initialID)
 {
 	Solution initialSolution;
+	//copy cities data
+	CitiesData area;
+	area.count = initArea.count;
+	area.k = initArea.k;
+	area.warehouse = initArea.warehouse;
+	area.cities = (City*)malloc(sizeof(City)*area.count);
+	for (int i=0; i<area.count; i++)
+	{
+		area.cities[i] = initArea.cities[i];
+	}
+
+
 	City nextCity = getCity(area, initialID);
 	int  i, j, bufferCount;
 	initialSolution.num_routes = 0;
@@ -72,7 +85,7 @@ Solution getNearestNeighbourSolution(CitiesData area, int initialID)
 
 
 	//for all cities
-	for (i=0; i<area.count; i++)
+	for (i=0; i<area.count; )
 	{
 		City* cityBuffer = (City*)malloc(sizeof(City)*(area.k+2));
 		cityBuffer[0] = area.warehouse;
@@ -90,8 +103,8 @@ Solution getNearestNeighbourSolution(CitiesData area, int initialID)
 			hideCity(area, nextCity.id);
 			nextCity = getNeighbour(area, nextCity);
 		}
-		cityBuffer[area.k+1] = area.warehouse;
-		insertRouteIn(initialSolution, cityBuffer, ++bufferCount);
+		cityBuffer[bufferCount++] = area.warehouse;
+		insertRouteIn(initialSolution, cityBuffer, bufferCount);
 	}
 
 	return initialSolution;

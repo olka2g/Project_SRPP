@@ -24,3 +24,6 @@ City randomCity(CitiesData cd);
 Solution getBetterSolution(Solution solution, Solution bestSolution);
 
 Solution getRandomSolution(CitiesData cd);
+
+void sortAndPrintAllCities(CitiesData area, Solution solution);
+int cityQuickSortComparison (const void * a, const void * b);

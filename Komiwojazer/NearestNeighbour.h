@@ -7,4 +7,4 @@
 #include <float.h>
 
 City getNeighbour(const CitiesData& area, City city);
-Solution getNearestNeighbourSolution(CitiesData area, int initialID = 1);
+Solution getNearestNeighbourSolution(CitiesData& area, int initialID = 1);

@@ -20,12 +20,38 @@ bool shouldStop(int iteration)
 	return (iteration >= MAX_ITERATIONS);
 }
 
+Solution copySolution(const Solution& solution)
+{
+	Solution newSolution;
+	newSolution.num_routes = solution.num_routes;
+	newSolution.routes = (Route*) malloc(sizeof(Route)*solution.num_routes);
 
+	for (int i=0; i<solution.num_routes; i++)
+	{
+		newSolution.routes[i].cities = (City*) malloc(sizeof(City)*solution.routes[i].num_cities);
+		newSolution.routes[i].num_cities = solution.routes[i].num_cities;
 
-SolutionCandidate swapCitiesIn(const Solution& solution, City city1, City city2)
+		for (int j=0; j<solution.routes[i].num_cities; j++)
+		{
+			newSolution.routes[i].cities[j] = solution.routes[i].cities[j];
+		}
+	}
+
+	return newSolution;
+}
+
+void destroySolution(Solution& solution)
+{
+	for (int i=0; i<solution.num_routes; i++)
+		free(solution.routes[i].cities);
+
+	free(solution.routes);
+}
+
+SolutionCandidate swapCitiesIn(const Solution solution, City city1, City city2)
 {
 	SolutionCandidate newSolution;
-	newSolution.solution = solution;
+	newSolution.solution = copySolution(solution);
 	int routeID1, routeID2;
 
 	for (int i = 0; i<solution.num_routes; i++)
@@ -47,7 +73,6 @@ SolutionCandidate swapCitiesIn(const Solution& solution, City city1, City city2)
 
 		//TODO maybe - check if breaking the loop when found will work faster or not
 	}
-
 	if (routeID1 == routeID2)
 	{
 		newSolution.numberOfModifications = 1;
@@ -82,9 +107,12 @@ Route getLongestRouteIn(Solution solution, int skipFirstLongest = 0)
 }
 
 
-void generateNeighbourhood(Solution& baseSolution, std::vector<SolutionCandidate>& neighbourhood, CitiesData& area)
+void generateNeighbourhood(Solution& baseSolution, std::vector<SolutionCandidate>& neighbourhood, CitiesData area)
 {
+// 	for (int i=0; i<neighbourhood.size(); i++)
+// 		destroySolution(neighbourhood[i].solution);
 	neighbourhood.clear();
+
 	Route longest = getLongestRouteIn(baseSolution);
 	City neighbourCity;
 	
@@ -160,46 +188,26 @@ void updateTabu(std::vector<TabuItem>& tabuList, SolutionCandidate& baseSolution
 }
 
 
-int cmpfunc (const void * a, const void * b)
-{
-	return ((*(City*)a).id - (*(City*)b).id);
-}
-
-void sortAndPrint(CitiesData area, Solution solution)
-{
-	City* cities = (City*)malloc(sizeof(City)*area.count);
-	int cityIterator = 0;
-
-	for (int i=0; i<solution.num_routes; i++)
-	{
-		for (int j=1; j<solution.routes[i].num_cities-1; j++)
-		{
-			cities[cityIterator] = solution.routes[i].cities[j];
-			cityIterator++;
-		}
-	}
-
-	qsort(cities, cityIterator, sizeof(City),cmpfunc);
-
-	for (int i=0; i<cityIterator; i++)
-	{
-		printf("%d ", cities[i].id);
-	}
-}
-
-
-
-Solution Tabu_findPath(CitiesData cities)
+Solution Tabu_findPath(CitiesData area)
 {
 	int tabuSize = TABU_DURATION_TIME * 2;
 	int i = 0;
 	std::vector<TabuItem> tabuList;
 	std::vector<SolutionCandidate> neighbourhood;
 
-	Solution baseSolution = getNearestNeighbourSolution(cities);
+	Solution baseSolution = getNearestNeighbourSolution(area);
+
+// 	qsort(area.cities, area.count, sizeof(City),cityQuickSortComparison);
+// 	for (int g=0; g<area.count; g++)
+// 	{
+// 		printf("%02ld ", area.cities[g].id);
+// 		if ((g+1) % 10 == 0)
+// 			printf("\n");
+// 	}
+// 	printf("\n");
 	/////DEBUG
 	printResults(baseSolution);
-	sortAndPrint(cities, baseSolution);
+	//sortAndPrintAllCities(cities, baseSolution);
 	///////////////
 	Solution bestSolution = baseSolution;
 	float bestCost = getRoutesLength(bestSolution);
@@ -207,8 +215,7 @@ Solution Tabu_findPath(CitiesData cities)
 
 	while(!shouldStop(i))
 	{
-
-		generateNeighbourhood(baseSolution, neighbourhood, cities);
+		generateNeighbourhood(baseSolution, neighbourhood, area);
 		baseSolutionCandidate = getBestSolution(neighbourhood, tabuList);
 		updateTabu(tabuList, baseSolutionCandidate);
 		bestSolution = getBetterSolution(baseSolutionCandidate.solution, bestSolution);
@@ -216,7 +223,7 @@ Solution Tabu_findPath(CitiesData cities)
 		i++;
 	}
 
-	
+	sortAndPrintAllCities(area, bestSolution);
 
 	return bestSolution;
 }

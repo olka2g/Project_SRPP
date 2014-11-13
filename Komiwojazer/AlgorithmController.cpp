@@ -172,6 +172,39 @@ Solution getRandomSolution(CitiesData cd){
 	return s;
 }
 
+//support for sortAndPrintAllCities function
+int cityQuickSortComparison (const void * a, const void * b)
+{
+	return ((*(City*)a).id - (*(City*)b).id);
+}
 
+//debug function - useful to check if every city is included and there's no repetition
+void sortAndPrintAllCities(CitiesData area, Solution solution)
+{
+	City* cities = (City*)malloc(sizeof(City)*area.count);
+	int cityIterator = 0;
+
+	for (int i=0; i<solution.num_routes; i++)
+	{
+		for (int j=1; j<solution.routes[i].num_cities-1; j++)
+		{
+			cities[cityIterator] = solution.routes[i].cities[j];
+			cityIterator++;
+		}
+	}
+
+	qsort(cities, cityIterator, sizeof(City),cityQuickSortComparison);
+
+	printf("Uzyte miasta:\n");
+	for (int i=0; i<cityIterator; i++)
+	{
+		printf("%02ld ", cities[i].id);
+		if ((i+1) % 10 == 0)
+			printf("\n");
+	}
+	printf("\n");
+
+	free(cities);
+}
 
 #pragma endregion
