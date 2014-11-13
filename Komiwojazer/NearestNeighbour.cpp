@@ -94,7 +94,6 @@ Solution getNearestNeighbourSolution(CitiesData area, int initialID)
 		insertRouteIn(initialSolution, cityBuffer, ++bufferCount);
 	}
 
-	printResults(initialSolution);
 	return initialSolution;
 }
 

@@ -17,17 +17,16 @@ typedef struct SolutionCandidate
 
 bool shouldStop(int iteration)
 {
-	return (iteration < MAX_ITERATIONS);
+	return (iteration >= MAX_ITERATIONS);
 }
 
 
 
-SolutionCandidate swapCitiesIn(Solution solution, City city1, City city2)
+SolutionCandidate swapCitiesIn(const Solution& solution, City city1, City city2)
 {
 	SolutionCandidate newSolution;
 	newSolution.solution = solution;
-	newSolution.numberOfModifications = 0;
-	newSolution.modifiedRoutes = (Route*) malloc(sizeof(Route)*2);
+	int routeID1, routeID2;
 
 	for (int i = 0; i<solution.num_routes; i++)
 	{
@@ -36,20 +35,31 @@ SolutionCandidate swapCitiesIn(Solution solution, City city1, City city2)
 			if (solution.routes[i].cities[j].id == city1.id)
 			{
 				newSolution.solution.routes[i].cities[j] = city2;
-				newSolution.modifiedRoutes[newSolution.numberOfModifications] = newSolution.solution.routes[i];
-				newSolution.numberOfModifications++;
+				routeID1 = i;
 			}
 
-			else if (solution.routes[i].cities[j].id == city2.id)
+			if (solution.routes[i].cities[j].id == city2.id)
 			{
 				newSolution.solution.routes[i].cities[j] = city1;
-				newSolution.modifiedRoutes[newSolution.numberOfModifications] = newSolution.solution.routes[i];
-				newSolution.numberOfModifications++;
+				routeID2 = i;
 			}
 		}
 
-		if (newSolution.numberOfModifications == 2)
-			break;
+		//TODO maybe - check if breaking the loop when found will work faster or not
+	}
+
+	if (routeID1 == routeID2)
+	{
+		newSolution.numberOfModifications = 1;
+		newSolution.modifiedRoutes = (Route*) malloc(sizeof(Route));
+		newSolution.modifiedRoutes[0] = newSolution.solution.routes[routeID1];
+	}
+	else
+	{
+		newSolution.numberOfModifications = 2;
+		newSolution.modifiedRoutes = (Route*) malloc(sizeof(Route)*2);
+		newSolution.modifiedRoutes[0] = newSolution.solution.routes[routeID1];
+		newSolution.modifiedRoutes[1] = newSolution.solution.routes[routeID2];
 	}
 
 	return newSolution;
@@ -72,13 +82,13 @@ Route getLongestRouteIn(Solution solution, int skipFirstLongest = 0)
 }
 
 
-void generateNeighbourhood(Solution baseSolution, std::vector<SolutionCandidate> neighbourhood, CitiesData area)
+void generateNeighbourhood(Solution& baseSolution, std::vector<SolutionCandidate>& neighbourhood, CitiesData& area)
 {
 	neighbourhood.clear();
 	Route longest = getLongestRouteIn(baseSolution);
 	City neighbourCity;
 	
-	for (int i = 0; i< longest.num_cities; i++)
+	for (int i = 1; i< longest.num_cities-1; i++)
 	{
 		neighbourCity = getNeighbour(area, longest.cities[i]);
 		neighbourhood.push_back(swapCitiesIn(baseSolution, longest.cities[i], neighbourCity));
@@ -87,9 +97,9 @@ void generateNeighbourhood(Solution baseSolution, std::vector<SolutionCandidate>
 }
 
 
-bool isTabu(SolutionCandidate candidate, TabuItem* tabuList, int tabuSize)
+bool isTabu(SolutionCandidate& candidate, std::vector<TabuItem>& tabuList)
 {
-	for (int i=0; i<tabuSize; i++)
+	for (int i=0; i<tabuList.size(); i++)
 	{
 		for (int j=0; j<candidate.numberOfModifications; j++)
 		{
@@ -101,7 +111,7 @@ bool isTabu(SolutionCandidate candidate, TabuItem* tabuList, int tabuSize)
 	return false;
 }
 
-SolutionCandidate getBestSolution(std::vector<SolutionCandidate> neighbourhood, TabuItem* tabuList, int tabuSize)
+SolutionCandidate getBestSolution(std::vector<SolutionCandidate>& neighbourhood, std::vector<TabuItem>& tabuList)
 {
 	SolutionCandidate bestCandidate = neighbourhood[0];
 	float lowestCost = getRoutesLength(bestCandidate.solution);
@@ -110,7 +120,7 @@ SolutionCandidate getBestSolution(std::vector<SolutionCandidate> neighbourhood, 
 	{
 		if (getRoutesLength(neighbourhood[i].solution) < lowestCost)
 		{
-			if (!isTabu(neighbourhood[i], tabuList, tabuSize))
+			if (!isTabu(neighbourhood[i], tabuList))
 			{
 				bestCandidate = neighbourhood[i];
 				lowestCost = getRoutesLength(bestCandidate.solution);
@@ -121,14 +131,14 @@ SolutionCandidate getBestSolution(std::vector<SolutionCandidate> neighbourhood, 
 	return bestCandidate;
 }
 
-void updateTabu(TabuItem* tabuList, int tabuSize, SolutionCandidate baseSolutionCandidate)
+void updateTabu(std::vector<TabuItem>& tabuList, SolutionCandidate& baseSolutionCandidate)
 {
-	for (int i=0; i<tabuSize; i++)
+	for (int i=0; i<tabuList.size(); i++)
 	{
 		tabuList[i].iterationLeft--;
 	}
 
-	for (int i=0; i<tabuSize; i++)
+	for (int i=0; i<tabuList.size(); i++)
 	{
 		if (tabuList[i].iterationLeft <= 0)
 		{
@@ -139,8 +149,43 @@ void updateTabu(TabuItem* tabuList, int tabuSize, SolutionCandidate baseSolution
 			}
 		}
 	}
+
+	while (baseSolutionCandidate.numberOfModifications > 0)
+	{
+		TabuItem newItem;
+		newItem.tabuRoute = baseSolutionCandidate.modifiedRoutes[--baseSolutionCandidate.numberOfModifications];
+		newItem.iterationLeft = TABU_DURATION_TIME;
+		tabuList.push_back(newItem);
+	}
 }
 
+
+int cmpfunc (const void * a, const void * b)
+{
+	return ((*(City*)a).id - (*(City*)b).id);
+}
+
+void sortAndPrint(CitiesData area, Solution solution)
+{
+	City* cities = (City*)malloc(sizeof(City)*area.count);
+	int cityIterator = 0;
+
+	for (int i=0; i<solution.num_routes; i++)
+	{
+		for (int j=1; j<solution.routes[i].num_cities-1; j++)
+		{
+			cities[cityIterator] = solution.routes[i].cities[j];
+			cityIterator++;
+		}
+	}
+
+	qsort(cities, cityIterator, sizeof(City),cmpfunc);
+
+	for (int i=0; i<cityIterator; i++)
+	{
+		printf("%d ", cities[i].id);
+	}
+}
 
 
 
@@ -148,12 +193,13 @@ Solution Tabu_findPath(CitiesData cities)
 {
 	int tabuSize = TABU_DURATION_TIME * 2;
 	int i = 0;
-	TabuItem* tabuList = (TabuItem*) malloc(sizeof(TabuItem)*tabuSize);
+	std::vector<TabuItem> tabuList;
 	std::vector<SolutionCandidate> neighbourhood;
 
 	Solution baseSolution = getNearestNeighbourSolution(cities);
 	/////DEBUG
 	printResults(baseSolution);
+	sortAndPrint(cities, baseSolution);
 	///////////////
 	Solution bestSolution = baseSolution;
 	float bestCost = getRoutesLength(bestSolution);
@@ -163,13 +209,14 @@ Solution Tabu_findPath(CitiesData cities)
 	{
 
 		generateNeighbourhood(baseSolution, neighbourhood, cities);
-		baseSolutionCandidate = getBestSolution(neighbourhood, tabuList, tabuSize);
-		updateTabu(tabuList, tabuSize, baseSolutionCandidate);
+		baseSolutionCandidate = getBestSolution(neighbourhood, tabuList);
+		updateTabu(tabuList, baseSolutionCandidate);
 		bestSolution = getBetterSolution(baseSolutionCandidate.solution, bestSolution);
+		baseSolution = baseSolutionCandidate.solution;
 		i++;
 	}
 
-	free(tabuList);
+	
 
 	return bestSolution;
 }
