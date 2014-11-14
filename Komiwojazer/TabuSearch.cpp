@@ -190,40 +190,50 @@ void updateTabu(std::vector<TabuItem>& tabuList, SolutionCandidate& baseSolution
 
 Solution Tabu_findPath(CitiesData area)
 {
-	int tabuSize = TABU_DURATION_TIME * 2;
-	int i = 0;
-	std::vector<TabuItem> tabuList;
-	std::vector<SolutionCandidate> neighbourhood;
+	int numberOfCycles = area.count / TABU_CYCLE_INTERVAL;
+	Solution bestSolution;
 
-	Solution baseSolution = getNearestNeighbourSolution(area);
-
-// 	qsort(area.cities, area.count, sizeof(City),cityQuickSortComparison);
-// 	for (int g=0; g<area.count; g++)
-// 	{
-// 		printf("%02ld ", area.cities[g].id);
-// 		if ((g+1) % 10 == 0)
-// 			printf("\n");
-// 	}
-// 	printf("\n");
-	/////DEBUG
-	printResults(baseSolution);
-	//sortAndPrintAllCities(cities, baseSolution);
-	///////////////
-	Solution bestSolution = baseSolution;
-	float bestCost = getRoutesLength(bestSolution);
-	SolutionCandidate baseSolutionCandidate;
-
-	while(!shouldStop(i))
+	for (int cycle = 0; cycle<numberOfCycles; cycle++)
 	{
-		generateNeighbourhood(baseSolution, neighbourhood, area);
-		baseSolutionCandidate = getBestSolution(neighbourhood, tabuList);
-		updateTabu(tabuList, baseSolutionCandidate);
-		bestSolution = getBetterSolution(baseSolutionCandidate.solution, bestSolution);
-		baseSolution = baseSolutionCandidate.solution;
-		i++;
+		int i = 0;
+		std::vector<TabuItem> tabuList;
+		std::vector<SolutionCandidate> neighbourhood;
+
+		Solution baseSolution = getNearestNeighbourSolution(area, cycle*TABU_CYCLE_INTERVAL + 1);
+		printf("%d before %f \n", cycle, getRoutesLength(baseSolution));
+			// 	qsort(area.cities, area.count, sizeof(City),cityQuickSortComparison);
+			// 	for (int g=0; g<area.count; g++)
+			// 	{
+			// 		printf("%02ld ", area.cities[g].id);
+			// 		if ((g+1) % 10 == 0)
+			// 			printf("\n");
+			// 	}
+			// 	printf("\n");
+		/////DEBUG
+		//printResults(baseSolution);
+		//sortAndPrintAllCities(cities, baseSolution);
+		///////////////
+		if (!cycle)
+			bestSolution = baseSolution;
+		else
+			bestSolution = getBetterSolution(bestSolution, baseSolution);
+		float bestCost = getRoutesLength(bestSolution);
+		SolutionCandidate baseSolutionCandidate;
+
+		while(!shouldStop(i))
+		{
+			generateNeighbourhood(baseSolution, neighbourhood, area);
+			baseSolutionCandidate = getBestSolution(neighbourhood, tabuList);
+			updateTabu(tabuList, baseSolutionCandidate);
+			bestSolution = getBetterSolution(baseSolutionCandidate.solution, bestSolution);
+			baseSolution = baseSolutionCandidate.solution;
+			i++;
+		}
+
+		
+		printf("%d after %f \n", cycle, getRoutesLength(bestSolution));
+
 	}
-
 	sortAndPrintAllCities(area, bestSolution);
-
 	return bestSolution;
 }

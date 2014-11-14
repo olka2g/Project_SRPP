@@ -32,7 +32,7 @@ City getNeighbour(const CitiesData& area, City city)
 	City nearest;
 	float distance = FLT_MAX;//distanceBetween(city, nearest);
 
-	for (int i = 1; i<area.count; i++)
+	for (int i = 0; i<area.count; i++)
 	{
 		if (area.cities[i].id > 0)
 			if(area.cities[i].id != city.id)
@@ -93,6 +93,19 @@ Solution getNearestNeighbourSolution(CitiesData& initArea, int initialID)
 
 		for(j=1; j<=area.k; j++)
 		{
+
+// 			if(i>=96)
+// 			{
+// 				 	qsort(area.cities, area.count, sizeof(City),cityQuickSortComparison);
+// 				 	for (int g=0; g<area.count; g++)
+// 				 	{
+// 				 		printf("%02ld ", area.cities[g].id);
+// 				 		if ((g+1) % 10 == 0)
+// 				 			printf("\n");
+// 				 	}
+// 				 	printf("\n");
+// 			}
+
 			cityBuffer[j] = nextCity;
 			bufferCount++;
 
