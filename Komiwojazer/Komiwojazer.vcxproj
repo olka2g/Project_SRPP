@@ -63,6 +63,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AlgorithmController.cpp" />
+    <ClCompile Include="DataOperations.cpp" />
     <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="GRASP.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -71,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AlgorithmController.h" />
+    <ClInclude Include="DataOperations.h" />
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="GRASP.h" />

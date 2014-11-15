@@ -22,7 +22,7 @@ float distanceBetween(City c1, City c2)
 }
 
 
-float getSingleRouteLength(Route route)
+float getSingleRouteLength(Route& route)
 {
 	float route_length = 0;
 
@@ -39,7 +39,9 @@ float getSingleRouteLength(Route route)
 	return route_length;
 }
 
-bool AreSame(Route route1, Route route2)
+//Returns true if two routes are exactly the same (contains all cities in the same order).
+//Caution! It returns false if route2 is same as route1 but backwards.
+bool AreSame(Route& route1, Route& route2)
 {
 	if (route1.num_cities != route2.num_cities)
 		return false;
@@ -179,11 +181,12 @@ int cityQuickSortComparison (const void * a, const void * b)
 }
 
 //debug function - useful to check if every city is included and there's no repetition
-void sortAndPrintAllCities(CitiesData area, Solution solution)
+void sortAndPrintAllCities(const CitiesData& area, const Solution& solution)
 {
 	City* cities = (City*)malloc(sizeof(City)*area.count);
 	int cityIterator = 0;
 
+	//copy all the cities to the separate array
 	for (int i=0; i<solution.num_routes; i++)
 	{
 		for (int j=1; j<solution.routes[i].num_cities-1; j++)
@@ -193,8 +196,10 @@ void sortAndPrintAllCities(CitiesData area, Solution solution)
 		}
 	}
 
+	//sort this array
 	qsort(cities, cityIterator, sizeof(City),cityQuickSortComparison);
 
+	//print ids of sorted cities (10 in row)
 	printf("Uzyte miasta:\n");
 	for (int i=0; i<cityIterator; i++)
 	{

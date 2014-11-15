@@ -13,9 +13,9 @@ float distanceBetween(City c1, City c2);
 
 float getRoutesLength(Solution solution);
 
-float getSingleRouteLength(Route route);
+float getSingleRouteLength(Route& route);
 
-bool AreSame(Route route1, Route route2);
+bool AreSame(Route& route1, Route& route2);
 
 void printResults(Solution solution);
 
@@ -25,5 +25,6 @@ Solution getBetterSolution(Solution solution, Solution bestSolution);
 
 Solution getRandomSolution(CitiesData cd);
 
-void sortAndPrintAllCities(CitiesData area, Solution solution);
-int cityQuickSortComparison (const void * a, const void * b);
+void sortAndPrintAllCities(const CitiesData& area, const Solution& solution);
+
+int cityQuickSortComparison (const void * a, const void * b); //might be useful if you want to sort array of cities (like the whole CityData) during debugging
