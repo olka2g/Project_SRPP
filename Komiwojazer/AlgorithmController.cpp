@@ -3,7 +3,8 @@
 #include <vector>
 
 Solution findPath(CitiesData cities){
-	return GRASP_findPath(cities);
+	//return GRASP_findPath(cities);
+	return Tabu_findPath(cities);
 }
 
 #pragma region functions common for all algorithms
@@ -20,24 +21,48 @@ float distanceBetween(City c1, City c2)
 	return result;
 }
 
-float getRoutesLength(Solution solution) // TODO: implement
+
+float getSingleRouteLength(Route& route)
+{
+	float route_length = 0;
+
+	// For each city on route
+	for (int j = 1; j < route.num_cities; j++)
+	{
+		route_length +=
+			distanceBetween(
+			route.cities[j-1],
+			route.cities[j]
+		);
+	}
+
+	return route_length;
+}
+
+//Returns true if two routes are exactly the same (contains all cities in the same order).
+//Caution! It returns false if route2 is same as route1 but backwards.
+bool AreSame(Route& route1, Route& route2)
+{
+	if (route1.num_cities != route2.num_cities)
+		return false;
+
+	for (int i=0; i<route1.num_cities; i++)
+	{
+		if (route1.cities[i].id != route2.cities[i].id)
+			return false;
+	}
+
+	return true;
+}
+
+float getRoutesLength(Solution solution)
 {
 	float sum = 0;
 
 	// For each route
 	for (int i = 0; i < solution.num_routes; i++)
 	{
-		float route_length = 0;
-
-		// For each city on route
-		for (int j = 1; j < solution.routes[i].num_cities; j++)
-		{
-			route_length +=
-				distanceBetween(
-				solution.routes[i].cities[j-1],
-				solution.routes[i].cities[j]
-			);
-		}
+		float route_length = getSingleRouteLength(solution.routes[i]);
 
 		sum += route_length;
 	}
@@ -148,4 +173,43 @@ Solution getRandomSolution(CitiesData cd){
 
 	return s;
 }
+
+//support for sortAndPrintAllCities function
+int cityQuickSortComparison (const void * a, const void * b)
+{
+	return ((*(City*)a).id - (*(City*)b).id);
+}
+
+//debug function - useful to check if every city is included and there's no repetition
+void sortAndPrintAllCities(const CitiesData& area, const Solution& solution)
+{
+	City* cities = (City*)malloc(sizeof(City)*area.count);
+	int cityIterator = 0;
+
+	//copy all the cities to the separate array
+	for (int i=0; i<solution.num_routes; i++)
+	{
+		for (int j=1; j<solution.routes[i].num_cities-1; j++)
+		{
+			cities[cityIterator] = solution.routes[i].cities[j];
+			cityIterator++;
+		}
+	}
+
+	//sort this array
+	qsort(cities, cityIterator, sizeof(City),cityQuickSortComparison);
+
+	//print ids of sorted cities (10 in row)
+	printf("Uzyte miasta:\n");
+	for (int i=0; i<cityIterator; i++)
+	{
+		printf("%02ld ", cities[i].id);
+		if ((i+1) % 10 == 0)
+			printf("\n");
+	}
+	printf("\n");
+
+	free(cities);
+}
+
 #pragma endregion
