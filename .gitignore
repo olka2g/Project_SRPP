@@ -50,3 +50,7 @@ Komiwojazer/Debug/*
 *.opensdf
 *.pdb
 *.exe
+*.suo
+*.sdf
+*.sdf
+*.suo
