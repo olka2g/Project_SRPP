@@ -69,6 +69,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="NearestNeighbour.cpp" />
     <ClCompile Include="TabuSearch.cpp" />
+    <ClCompile Include="Visualization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AlgorithmController.h" />
@@ -76,8 +77,14 @@
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="GRASP.h" />
+    <ClInclude Include="lib\cimg\CImg.h" />
     <ClInclude Include="NearestNeighbour.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="TabuSearch.h" />
+    <ClInclude Include="Visualization.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Komiwojazer.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

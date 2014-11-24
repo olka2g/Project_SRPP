@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <ctime>
 
 Solution findPath(CitiesData cities);
 

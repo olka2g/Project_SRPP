@@ -1,5 +1,21 @@
 #include "DataOperations.h"
 
+City getCity(const CitiesData& area, int x, int y)
+{
+	if (area.warehouse.location.x == x && area.warehouse.location.y == y)
+		return area.warehouse;
+	
+	for (int i=0; i<area.count; i++)
+	{
+		if (area.cities[i].location.x == x && area.cities[i].location.y == y)
+			return area.cities[i];
+	}
+	City nullCity;
+	nullCity.id = -1;
+
+	return nullCity;
+}
+
 City getCity(const CitiesData& area, int id)
 {
 	for (int i=0; i<area.count; i++)

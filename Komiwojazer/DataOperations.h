@@ -12,6 +12,12 @@
 City getCity(const CitiesData& area, int id);
 
 /*
+	Returns city located in given area under coordinates x,y
+	If there is no city there, returns city with id == -1
+*/
+City getCity(const CitiesData& area, int x, int y);
+
+/*
 	Changes size of solution, modifies number of routes (must be initialized, even if it's 0)
 	and adds cityBuffer to the array inside the solution. To avoid thousands of reallocations, it uses
 	directly cityBuffer (does not copy it) thus - do not change it latter! Once used here, its gone. malloc it again.
