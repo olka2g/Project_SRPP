@@ -4,9 +4,14 @@
 #include "AlgorithmController.h"
 
 
-#define GRASP_MAX_ITERATIONS 1000
+#define GRASP_MAX_ITERATIONS 50
 
 // greediness
 #define GRASP_ALPHA 0.3
+
+typedef struct Candidate{
+	City c;
+	double incrementalCost;
+}Candidate;
 
 Solution GRASP_findPath(CitiesData cities);

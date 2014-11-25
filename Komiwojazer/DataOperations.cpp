@@ -1,5 +1,12 @@
 #include "DataOperations.h"
 
+void copyRoute(Route &dst, Route &src)
+{
+	dst.cities = (City*)malloc(sizeof(City)*src.num_cities);
+	memcpy(dst.cities,src.cities,src.num_cities*sizeof(City));
+	dst.num_cities = src.num_cities;
+}
+
 City getCity(const CitiesData& area, int x, int y)
 {
 	if (area.warehouse.location.x == x && area.warehouse.location.y == y)

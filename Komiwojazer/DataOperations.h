@@ -5,6 +5,12 @@
 
 #include <stdlib.h>
 
+
+/*
+	Copies Route from src to dst
+*/
+void copyRoute(Route &dst, Route &src);
+
 /*
 	Returns city of given id (copy - type City is "pointer free") from given area.
 	If it cannot find this city in the area, returns -1.

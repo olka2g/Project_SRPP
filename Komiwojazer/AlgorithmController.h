@@ -29,3 +29,9 @@ Solution getRandomSolution(CitiesData cd);
 void sortAndPrintAllCities(const CitiesData& area, const Solution& solution);
 
 int cityQuickSortComparison (const void * a, const void * b); //might be useful if you want to sort array of cities (like the whole CityData) during debugging
+
+// uniform but slow
+long uniformRandomInRange(long from, long to);
+
+// fast but non uniform distibution
+long fastRandomInRange(long from, long to);
