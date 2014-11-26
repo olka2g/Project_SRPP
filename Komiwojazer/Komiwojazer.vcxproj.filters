@@ -54,6 +54,9 @@
     <ClCompile Include="Visualization.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
+    <ClCompile Include="TwoOpt.cpp">
+      <Filter>Source Files\Algorithms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GRASP.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="AlgorithmController.h">
       <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="TwoOpt.h">
+      <Filter>Header Files\Algorithms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

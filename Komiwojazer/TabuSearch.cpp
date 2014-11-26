@@ -1,4 +1,6 @@
 #include "TabuSearch.h"
+#include "TwoOpt.h"
+#include "DataOperations.h"
 
 /* Local data structures for the algorithm */
 typedef struct TabuItem
@@ -68,8 +70,11 @@ SolutionCandidate swapCitiesIn(const Solution& solution, City city1, City city2)
 /* Generate solutionCandidates that will be solution's neighbourhood */
 void generateNeighbourhood(Solution& baseSolution, std::vector<SolutionCandidate>& neighbourhood, const CitiesData& area)
 {
-// 	for (int i=0; i<neighbourhood.size(); i++)
-// 		destroySolution(neighbourhood[i].solution);
+ 	for (int i=0; i<neighbourhood.size(); i++)
+ 	{
+		destroySolution(neighbourhood[i].solution);
+		//free(neighbourhood[i].modifiedRoutes);
+	}
 	neighbourhood.clear();
 
 	//find longest route in the solution and swap each of its cities with its neighbour
@@ -104,6 +109,7 @@ SolutionCandidate getBestSolution(std::vector<SolutionCandidate>& neighbourhood,
 {
 	SolutionCandidate bestCandidate = neighbourhood[0];
 	float lowestCost = getRoutesLength(bestCandidate.solution);
+	int bestCandidateIndex = 0;
 
 	for (int i=1; i<neighbourhood.size(); i++)
 	{
@@ -111,11 +117,14 @@ SolutionCandidate getBestSolution(std::vector<SolutionCandidate>& neighbourhood,
 		{
 			if (!isTabu(neighbourhood[i], tabuList))
 			{
+				bestCandidateIndex = i;
 				bestCandidate = neighbourhood[i];
 				lowestCost = getRoutesLength(bestCandidate.solution);
 			}
 		}
 	}
+
+	take(neighbourhood,bestCandidateIndex);
 
 	return bestCandidate;
 }
@@ -182,14 +191,24 @@ Solution Tabu_findPath(const CitiesData& cities)
 			baseSolutionCandidate = getBestSolution(neighbourhood, tabuList);
 			updateTabu(tabuList, baseSolutionCandidate);
 			bestSolution = getBetterSolution(baseSolutionCandidate.solution, bestSolution);
+			Solution tmp = baseSolution;
 			baseSolution = baseSolutionCandidate.solution;
+
+			if (tmp.routes != bestSolution.routes)
+			{
+				destroySolution(tmp);
+			}
 			i++;
 		}
+
+		//destroySolution()
 
 		////DEBUG
 		printf("%d after %f \n", cycle, getRoutesLength(bestSolution));
 
 	}
+	bestSolution = twoOpt(bestSolution);
+	
 	////DEBUG
 	sortAndPrintAllCities(cities, bestSolution);
 	return bestSolution;

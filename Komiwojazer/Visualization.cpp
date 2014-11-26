@@ -108,12 +108,38 @@ void getBoundaries(CitiesData &cd, int &maxX, int &minX, int &maxY, int &minY)
 	minX -= 20;	
 }
 
-void createCitiesDisplay(CImgDisplay& disp, CImg<unsigned char>& image, CitiesData cd)
+void addToAllY(CitiesData& cd, int n)
+{
+	for (int i = 0; i < cd.count; i++)
+	{
+		cd.cities[i].location.y += n;
+	}
+	cd.warehouse.location.y += n;
+}
+
+void addToAllX(CitiesData& cd, int n)
+{
+	for (int i = 0; i < cd.count; i++)
+	{
+		cd.cities[i].location.x += n;
+	}
+	cd.warehouse.location.x += n;
+}
+
+#define PADDING 15
+
+void createCitiesDisplay(CImgDisplay& disp, CImg<unsigned char>& image, CitiesData& cd)
 {
 	int minX,minY,maxX,maxY;
 	getBoundaries(cd, maxX, minX, maxY, minY);
+	if(minY < PADDING){
+		addToAllY(cd,PADDING-minY);
+	}
+	if(minX < PADDING){
+		addToAllX(cd,PADDING-minX);
+	}
 
-	CImg<unsigned char> img(maxY,maxX,1,3,0);	
+	CImg<unsigned char> img(maxY-minY + 2*PADDING,maxX-minX + 2*PADDING,1,3,0);	
 	unsigned char white[] = { 255,255,255 };
 	unsigned char blue[] = { 0,0,255 };
 
@@ -217,7 +243,7 @@ void displayResultAnimated(CImgDisplay display, CImg<unsigned char> thisRoute, S
 	while(!display.is_closed())display.wait();
 }
 
-void createCitiesDisplay(CitiesData cd){
+void createCitiesDisplay(CitiesData& cd){
 	createCitiesDisplay(displ,map_image, cd);
 }
 

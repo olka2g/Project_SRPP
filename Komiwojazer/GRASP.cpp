@@ -1,6 +1,8 @@
 #include "GRASP.h"
 #include "Visualization.h"
 #include <algorithm>
+#include "Dijkstra.h"
+#include "TwoOpt.h"
 
 bool stopCriterion(int iteration){
 	return iteration >= GRASP_MAX_ITERATIONS;
@@ -8,15 +10,6 @@ bool stopCriterion(int iteration){
 
 bool solutionIncomplete(std::vector<City>& citiesToGo){	
 	return citiesToGo.size() > 0;
-}
-
-template <typename T>
-T take(std::vector<T>& v, typename std::vector<T>::size_type n)
-{
-	std::swap(v[n], v.back());
-	T t = v.back();
-	v.pop_back();
-	return t;
 }
 
 bool Candidate_compareByCost(const Candidate &a, const Candidate &b)
@@ -28,21 +21,23 @@ std::vector<Candidate> buildRCL(std::vector<City>& citiesToGo, Solution s, Citie
 {	
 	std::vector<Candidate> RCL;
 	std::vector<Candidate> allCandidates;
-	
+
 	// evaluate (myopic) incremental cost based on the last element of solution
 	for (int i = 0; i < citiesToGo.size(); i++)
 	{
 		Candidate c;
 		c.c = citiesToGo.at(i);
-				
+
 		if(s.num_routes == 0 || s.routes[s.num_routes-1].num_cities == cd.k + 2){
 			// will be the first city on the route -> incremental cost == route length 
-			
-			
-			// TODO: WA¯NE. sporbowac wsadzic kazde miasto do kazdej trasy gdzie jest miejsce 
+
+
+			// TODO: sporbowac wsadzic kazde miasto do kazdej trasy gdzie jest miejsce 
 			// ( i na roznych pozycjach) ( tez tych pustych) policzyc ile tras optymalnie
-			
-			
+
+
+			// TODO: optymalizowac trase ktorej teoretyczna dlugisc liczymy
+
 			c.incrementalCost = distanceBetween(cd.warehouse,c.c) * 2.0;
 		}else{
 			// will not be the first-> in that case calculate incremental cost
@@ -51,37 +46,39 @@ std::vector<Candidate> buildRCL(std::vector<City>& citiesToGo, Solution s, Citie
 			copyRoute(tmp,s.routes[s.num_routes-1]);
 
 			double costBefore = getSingleRouteLength(tmp);
-			
+
 			tmp.cities = (City*)realloc(tmp.cities,(tmp.num_cities + 1) * sizeof(City));
 			tmp.cities[tmp.num_cities - 2] = c.c;
 			tmp.cities[tmp.num_cities - 1] = cd.warehouse;
-			
+
 			double costAfter = getSingleRouteLength(tmp);
-			
+
 			free(tmp.cities);
 
 			c.incrementalCost = costAfter - costBefore;
 		}		
-		
+
 		allCandidates.push_back(c);
 	}
 
 	std::sort(allCandidates.begin(), allCandidates.end(),Candidate_compareByCost);
-	// TODO: sort all candidates by cost and choose alpha * 100% of them for the RCL
+
+	float threshold = allCandidates.back().incrementalCost - allCandidates.front().incrementalCost;
+	threshold *= GRASP_ALPHA;
+
 	for (int j = 0; j < allCandidates.size(); j++)
 	{
-		if(allCandidates.at(j).incrementalCost < 100 || RCL.size() < 10) // TODO:
+		if(allCandidates.at(j).incrementalCost < threshold || RCL.size() == 0)
 			RCL.push_back(allCandidates.at(j));
 	}
-	
 
 	return RCL;
 }
 
-Solution addRandomCandidateToSolution(std::vector<Candidate>& RCL,std::vector<City>& citiesToGo, Solution s, CitiesData cd) // TODO: test
+Solution addRandomCandidateToSolution(std::vector<Candidate>& RCL,std::vector<City>& citiesToGo, Solution s, CitiesData cd)
 {
 	if(RCL.size() < 1) return s;
-	
+
 	// choose and remove from RCL and citiesToGo
 	int ind = fastRandomInRange(0,RCL.size());
 	int i;
@@ -151,48 +148,9 @@ void swapCities(City* c, City* d){
 	d->location = tmp.location;		 
 }
 
-void getBestPermutation(Route& r,int i, Route& best) { 
-	if (r.num_cities - 1 == i){		
-		// if better than best swap
-		if(getSingleRouteLength(r) < getSingleRouteLength(best)){
-			copyRoute(best,r);
-		}
-		return;
-	}
-	int j = i;
-	for (j = i; j < r.num_cities - 1; j++) { 
-		swapCities(&r.cities[i],&r.cities[j]);
-		getBestPermutation(r,i+1,best);
-		swapCities(&r.cities[i],&r.cities[j]);
-	}
-	return;
-}
-
-
-void optimizeRoute(Route& r)
-{
-	// if route has less than 3 cities (+2 times warehouse) no improvement will occur
-	if(r.num_cities > 4){		
-		Route cpy;
-		copyRoute(cpy, r);
-		getBestPermutation(cpy,1,r);
-	}
-}
-
-Solution fineTuneSolution(Solution solution)
-{
-	for (int i = 0; i < solution.num_routes; i++)
-	{
-		// get shortest variation of each route
-		optimizeRoute(solution.routes[i]);
-	}
-	return solution;
-}
-
 Solution localSearch(Solution solution)
-{
-	// nie wiem
-	return solution; // TODO: this
+{	
+	return twoOpt(solution);
 }
 
 Solution GRASP_findPath(CitiesData cities){
@@ -202,7 +160,11 @@ Solution GRASP_findPath(CitiesData cities){
 	solution = greedyRandomizedConstruction(cities);
 	bestSolution = solution;
 
-	printf("starting fitness: %f\n",getRoutesLength(solution));
+	printf("num_cities = %d\nk = %d\n",cities.count+1,cities.k);
+
+	printf("alpha = %f\niterations = %d\n\n",GRASP_ALPHA,GRASP_MAX_ITERATIONS);
+
+	printf("starting solution distance: %f\n",getRoutesLength(solution));
 
 	int i;
 	for(int i = 1; !stopCriterion(i); i++){
@@ -212,19 +174,15 @@ Solution GRASP_findPath(CitiesData cities){
 		// neighborhood search
 		solution = localSearch(solution);		
 
-		double gain = getRoutesLength(bestSolution) - getRoutesLength(solution);
+		double gain = getRoutesLength(bestSolution) - getRoutesLength(solution);		
 		if(gain > 0)
-			printf("round %d. gained: %f\n",i,gain);
+			printf("new best in round %d.\tgained: %f\n",i,gain);
 
 		bestSolution = getBetterSolution(solution,bestSolution);
 
 		if(gain <= 0.0)destroySolution(solution);
 	}	
-	printf("\n");
-
-	// fine tuning
-	if(cities.k < 8)
-		solution = fineTuneSolution(solution);
+	printf("\n");	
 
 	return bestSolution;
 }

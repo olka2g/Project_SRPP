@@ -13,7 +13,7 @@ using namespace cimg_library;
 
 void getBoundaries(CitiesData &cd, int &maxX, int &minX, int &maxY, int &minY);
 
-void createCitiesDisplay(CitiesData cd);
+void createCitiesDisplay(CitiesData& cd);
 
 void displayResult(Solution solution);
 

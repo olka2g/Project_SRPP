@@ -4,7 +4,19 @@
 #include "AlgorithmController.h"
 
 #include <stdlib.h>
+#include <vector>
 
+/*
+	returns v[i] and removes it from the vector
+*/
+template <typename T>
+T take(std::vector<T>& v, typename std::vector<T>::size_type n)
+{
+	std::swap(v[n], v.back());
+	T t = v.back();
+	v.pop_back();
+	return t;
+}
 
 /*
 	Copies Route from src to dst

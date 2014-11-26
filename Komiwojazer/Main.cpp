@@ -28,8 +28,8 @@ int main()
 
 	printf("\nTime elapsed: %3.3f s\n",((double)(end-start))/CLOCKS_PER_SEC);
 
-	//displayResultAnimated(solution);
-	displayResult(solution);
+	displayResultAnimated(solution);
+	//displayResult(solution);
 
 	//getchar();
 
