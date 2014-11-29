@@ -4,10 +4,10 @@
 #include "AlgorithmController.h"
 
 // max iterations 1000 advised
-#define GRASP_MAX_ITERATIONS 2 /*1000*/
+#define GRASP_MAX_ITERATIONS 1000 /*1000*/
 
 // inverse greediness
-#define GRASP_ALPHA 0.2
+#define GRASP_ALPHA 0.005
 
 typedef struct Candidate{
 	City c;

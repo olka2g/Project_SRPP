@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "Dijkstra.h"
 #include "TwoOpt.h"
+#include <math.h>
 
 bool stopCriterion(int iteration){
 	return iteration >= GRASP_MAX_ITERATIONS;
@@ -31,27 +32,26 @@ std::vector<Candidate> buildRCL(std::vector<City>& citiesToGo, Solution s, Citie
 		if(s.num_routes == 0 || s.routes[s.num_routes-1].num_cities == cd.k + 2){
 			// will be the first city on the route -> incremental cost == route length 
 
-
 			// TODO: sporbowac wsadzic kazde miasto do kazdej trasy gdzie jest miejsce 
-			// ( i na roznych pozycjach) ( tez tych pustych) policzyc ile tras optymalnie
+			// ( i na roznych pozycjach) ( tez tych pustych) policzyc ile tras optymalnie			
 
-
-			// TODO: optymalizowac trase ktorej teoretyczna dlugisc liczymy
-
-			c.incrementalCost = distanceBetween(cd.warehouse,c.c) * 2.0;
+			//c.incrementalCost = distanceBetween(cd.warehouse,c.c) * 2.0;
+			c.incrementalCost = fastRandomInRange(0,1000);
 		}else{
 			// will not be the first-> in that case calculate incremental cost
 			// which is the difference between route length before adding city and after
 			Route tmp; 
 			copyRoute(tmp,s.routes[s.num_routes-1]);
-
+			
 			double costBefore = getSingleRouteLength(tmp);
 
 			tmp.cities = (City*)realloc(tmp.cities,(tmp.num_cities + 1) * sizeof(City));
-			tmp.cities[tmp.num_cities - 2] = c.c;
-			tmp.cities[tmp.num_cities - 1] = cd.warehouse;
+			tmp.cities[tmp.num_cities - 1] = c.c;
+			tmp.cities[tmp.num_cities - 0] = cd.warehouse;
+			tmp.num_cities++;
 
-			double costAfter = getSingleRouteLength(tmp);
+			//double costAfter = getSingleRouteLength(tmp);
+			double costAfter = getSingleRouteLength(twoOpt(tmp)); // to daje super mega du¿o lepsze wyniki (ale mocno zwalnia)
 
 			free(tmp.cities);
 
@@ -65,11 +65,13 @@ std::vector<Candidate> buildRCL(std::vector<City>& citiesToGo, Solution s, Citie
 
 	float threshold = allCandidates.back().incrementalCost - allCandidates.front().incrementalCost;
 	threshold *= GRASP_ALPHA;
+	threshold += allCandidates.front().incrementalCost;
 
 	for (int j = 0; j < allCandidates.size(); j++)
 	{
 		if(allCandidates.at(j).incrementalCost < threshold || RCL.size() == 0)
 			RCL.push_back(allCandidates.at(j));
+		else break; // list is sorted so we can break
 	}
 
 	return RCL;
@@ -80,7 +82,7 @@ Solution addRandomCandidateToSolution(std::vector<Candidate>& RCL,std::vector<Ci
 	if(RCL.size() < 1) return s;
 
 	// choose and remove from RCL and citiesToGo
-	int ind = fastRandomInRange(0,RCL.size());
+	int ind = uniformRandomInRange(0,RCL.size()-1);
 	int i;
 	Candidate chosen = take(RCL,ind);
 	for (i = 0; i < citiesToGo.size(); i++)
@@ -101,6 +103,9 @@ Solution addRandomCandidateToSolution(std::vector<Candidate>& RCL,std::vector<Ci
 		r.routes[i].cities = (City*)realloc((void*)r.routes[i].cities,r.routes[i].num_cities*sizeof(City));
 		r.routes[i].cities[r.routes[i].num_cities-2] = chosen.c;
 		r.routes[i].cities[r.routes[i].num_cities-1] = cd.warehouse;
+
+		r.routes[i] = twoOpt(r.routes[i]);
+
 		return r;
 	}else{
 		// ostatnia trasa jest pe³na, wiêc tworzymy now¹ z jednym elementem
@@ -116,8 +121,10 @@ Solution addRandomCandidateToSolution(std::vector<Candidate>& RCL,std::vector<Ci
 		r.routes[i].cities = (City*)malloc(3*sizeof(City));
 		r.routes[i].cities[0] = cd.warehouse;
 		r.routes[i].cities[1] = chosen.c;
-		r.routes[i].cities[2] = cd.warehouse;
+		r.routes[i].cities[2] = cd.warehouse;		
 	}
+
+	
 
 	return r;
 }
@@ -176,7 +183,13 @@ Solution GRASP_findPath(CitiesData cities){
 
 		double gain = getRoutesLength(bestSolution) - getRoutesLength(solution);		
 		if(gain > 0)
-			printf("new best in round %d.\tgained: %f\n",i,gain);
+			printf("\n[new best in round %d.\tgained: %f] ",i,gain);
+		else{			
+			float percentDone = (i * 100.0)/GRASP_MAX_ITERATIONS;
+			
+			if((i)%(int(GRASP_MAX_ITERATIONS/20)) == 0)
+				printf("%2.0f%c ",percentDone,'%');			
+		}
 
 		bestSolution = getBetterSolution(solution,bestSolution);
 

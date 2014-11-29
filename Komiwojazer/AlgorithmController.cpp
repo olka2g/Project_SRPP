@@ -80,7 +80,7 @@ void printResults(Solution solution)
 	{
 		for (int j = 0; j < solution.routes[i].num_cities; j++)
 		{
-			printf("%02ld ",solution.routes[i].cities[j].id);
+			printf("%2ld ",solution.routes[i].cities[j].id);
 		}
 
 		printf("\n");

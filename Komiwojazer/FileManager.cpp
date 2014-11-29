@@ -6,7 +6,7 @@
 
 char* chooseFile()
 {
-	return "data\\10_k=4";
+	return "data\\100_k=4";
 }
 
 CitiesData loadFile(char* filePath)

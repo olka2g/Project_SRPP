@@ -24,7 +24,7 @@ Route swap(Route r, int from, int to)
 }
 
 
-Solution twoOpt(Solution s){
+Solution twoOpt(Solution& s){
 	for (int i = 0; i < s.num_routes; i++)
 	{
 		s.routes[i] = twoOpt(s.routes[i]);
@@ -32,14 +32,14 @@ Solution twoOpt(Solution s){
 	return s;
 }
 
-Route twoOpt(Route r){
+Route twoOpt(Route& r){
 	float gain = 1.0;
 	float best = FLT_MAX;
 
 	while(gain > 0) {       
 		best = getSingleRouteLength(r);
 		
-		if(r.num_cities < 4) break;
+		if(r.num_cities < 5) break;
 
 		for (int i = 1; i < r.num_cities - 2; i++) {
 			for (int k = i + 1; k < r.num_cities -1; k++) {

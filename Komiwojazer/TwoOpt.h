@@ -5,8 +5,8 @@
 #include <algorithm>
 #include "DataTypes.h"
 
-Solution twoOpt(Solution s);
+Solution twoOpt(Solution& s);
 
-Route twoOpt(Route r);
+Route twoOpt(Route& r);
 
 Route swap(Route r, int from, int to);
