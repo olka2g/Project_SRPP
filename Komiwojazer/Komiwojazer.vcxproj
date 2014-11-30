@@ -67,6 +67,7 @@
     <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="GRASP.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="FlowerAlgorithm.cpp" />
     <ClCompile Include="NearestNeighbour.cpp" />
     <ClCompile Include="TabuSearch.cpp" />
     <ClCompile Include="TwoOpt.cpp" />
@@ -79,6 +80,7 @@
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="GRASP.h" />
     <ClInclude Include="lib\cimg\CImg.h" />
+    <ClInclude Include="FlowerAlgorithm.h" />
     <ClInclude Include="NearestNeighbour.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TabuSearch.h" />

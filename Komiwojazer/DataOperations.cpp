@@ -1,4 +1,61 @@
 #include "DataOperations.h"
+#include <vector>
+#include <algorithm>
+
+std::vector<closeNeighborhood> getNeighborhoods(CitiesData cd, int k){
+	std::vector<Candidate> cities;
+	for (int j = 0; j < cd.count; j++)
+	{
+		Candidate c;
+		c.c = cd.cities[j];
+		c.incrementalCost = 0;
+		cities.push_back(c);
+	}
+	
+	std::vector<closeNeighborhood> nbs;
+
+	for (int i = 0; i < cd.count; i++)
+	{
+		closeNeighborhood cn;
+		cn.c = cd.cities[i];
+		cn.n_neighbors = 0;
+		cn.neighbors = NULL;
+
+		nbs.push_back(cn);
+	}
+
+	for (int i = 0; i < cd.count; i++)
+	{
+		// policz odleglosc kazdego miasta od aktualnego
+		for (int cand = 0; cand < cities.size(); cand++)
+		{
+			cities.at(cand).incrementalCost = distanceBetween(cd.cities[i],cities.at(cand).c);
+		}
+		std::sort(cities.begin(), cities.end(),Candidate_compareByCost);
+				
+		nbs[i].n_neighbors = k;
+		nbs[i].neighbors = (closeNeighborhood**)malloc(sizeof(closeNeighborhood*)*k);
+		for (int nb = 0; nb < k; nb++)
+		{
+			nbs[i].neighbors[nb] = &nbs.at(nb);
+		}
+	}
+
+	return nbs;
+}
+
+
+void swapCities(City* c, City* d){
+	City tmp;
+	tmp.id = c->id;
+	tmp.location = c->location;
+
+	c->id = d->id;
+	c->location = d->location;
+
+	d->id = tmp.id;
+	d->location = tmp.location;		 	
+}
 
 void copyRoute(Route &dst, Route &src)
 {

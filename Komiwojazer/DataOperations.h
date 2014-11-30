@@ -6,6 +6,15 @@
 #include <stdlib.h>
 #include <vector>
 
+void swapCities(City* c, City* d);
+
+typedef struct closeNeighborhood{
+	City c;
+	closeNeighborhood** neighbors;
+	int n_neighbors;
+}closeNeighborhood;
+std::vector<closeNeighborhood> getNeighborhoods(CitiesData cd, int k);
+
 /*
 returns v[i] and removes it from the vector
 */

@@ -4,8 +4,11 @@
 #include <ctime>
 #include <algorithm>
 #include "DataTypes.h"
+#include "DataOperations.h"
 
 Solution twoOpt(Solution& s);
+
+void twoOpt(Route& r,Route& left,Route& right);
 
 Route twoOpt(Route& r);
 

@@ -143,18 +143,6 @@ Solution greedyRandomizedConstruction(CitiesData cities){
 	return s;
 }
 
-void swapCities(City* c, City* d){
-	City tmp;
-	tmp.id = c->id;
-	tmp.location = c->location;
-
-	c->id = d->id;
-	c->location = d->location;
-
-	d->id = tmp.id;
-	d->location = tmp.location;		 
-}
-
 Solution localSearch(Solution solution)
 {	
 	return twoOpt(solution);
@@ -179,7 +167,7 @@ Solution GRASP_findPath(CitiesData cities){
 		solution = greedyRandomizedConstruction(cities);
 
 		// neighborhood search
-		solution = localSearch(solution);		
+		//solution = localSearch(solution);		 // po dodaniu miasta sie optymalizuje
 
 		double gain = getRoutesLength(bestSolution) - getRoutesLength(solution);		
 		if(gain > 0)

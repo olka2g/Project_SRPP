@@ -24,6 +24,75 @@ Route swap(Route r, int from, int to)
 }
 
 
+
+
+void twoOpt(Route& r,Route& left,Route& right){
+
+	double best = getSingleRouteLength(r) + getSingleRouteLength(left) + getSingleRouteLength(right);
+	double gain = 0.0;
+
+	do{
+		gain = 0.0;
+		for (int i = 1; i < r.num_cities - 1; i++)
+		{
+			for (int li = 1; li < left.num_cities -1; li++)
+			{
+				double bef = getSingleRouteLength(r) + getSingleRouteLength(left);
+				swapCities(&r.cities[i],&left.cities[li]);
+				//
+				//
+				//r = twoOpt(r);
+				//left = twoOpt(left); // tODO: nie robic tego dwa razy
+				
+				
+				double after = getSingleRouteLength(r) + getSingleRouteLength(left);
+				if(bef < after){
+					swapCities(&r.cities[i],&left.cities[li]);
+					
+					//
+					//r = twoOpt(r);
+					//left = twoOpt(left); // tODO: nie robic tego dwa razy
+
+
+				}else{
+					gain += -after + bef;
+					goto br;
+				}
+			}
+
+			for (int ri = 1; ri < right.num_cities -1; ri++)
+			{
+				double bef = getSingleRouteLength(r) + getSingleRouteLength(right);
+				swapCities(&r.cities[i],&right.cities[ri]);
+
+
+				//r = twoOpt(r);
+				//right = twoOpt(right); // tODO: nie robic tego dwa razy
+
+
+				double after = getSingleRouteLength(r) + getSingleRouteLength(right);
+				if(bef < after){
+					swapCities(&r.cities[i],&right.cities[ri]);
+
+
+					//r = twoOpt(r);
+					//right = twoOpt(right); // tODO: nie robic tego dwa razy
+
+
+				}else{
+					gain += -after + bef;
+					goto br;
+				}
+			}
+br:			;
+		}
+	}while(gain > 0);
+
+	double af = getSingleRouteLength(r) + getSingleRouteLength(left) + getSingleRouteLength(right);
+
+	//printf("gained %3.3f\n",best-af);
+}
+
 Solution twoOpt(Solution& s){
 	for (int i = 0; i < s.num_routes; i++)
 	{
@@ -38,7 +107,7 @@ Route twoOpt(Route& r){
 
 	while(gain > 0) {       
 		best = getSingleRouteLength(r);
-		
+
 		if(r.num_cities < 5) break;
 
 		for (int i = 1; i < r.num_cities - 2; i++) {

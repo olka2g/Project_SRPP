@@ -1,9 +1,11 @@
 #include "AlgorithmController.h"
 #include <math.h>
 #include <vector>
+#include "FlowerAlgorithm.h"
 
 Solution findPath(CitiesData cities){
-	return GRASP_findPath(cities);
+	return Flower_findPath(cities);
+	//return GRASP_findPath(cities);
 	//return Tabu_findPath(cities);
 }
 
@@ -80,7 +82,7 @@ void printResults(Solution solution)
 	{
 		for (int j = 0; j < solution.routes[i].num_cities; j++)
 		{
-			printf("%2ld ",solution.routes[i].cities[j].id);
+			printf("%3ld ",solution.routes[i].cities[j].id);
 		}
 
 		printf("\n");
