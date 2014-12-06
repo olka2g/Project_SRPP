@@ -39,21 +39,11 @@ void twoOpt(Route& r,Route& left,Route& right){
 			{
 				double bef = getSingleRouteLength(r) + getSingleRouteLength(left);
 				swapCities(&r.cities[i],&left.cities[li]);
-				//
-				//
-				//r = twoOpt(r);
-				//left = twoOpt(left); // tODO: nie robic tego dwa razy
-				
 				
 				double after = getSingleRouteLength(r) + getSingleRouteLength(left);
 				if(bef < after){
 					swapCities(&r.cities[i],&left.cities[li]);
-					
-					//
-					//r = twoOpt(r);
-					//left = twoOpt(left); // tODO: nie robic tego dwa razy
-
-
+				
 				}else{
 					gain += -after + bef;
 					goto br;
@@ -65,19 +55,9 @@ void twoOpt(Route& r,Route& left,Route& right){
 				double bef = getSingleRouteLength(r) + getSingleRouteLength(right);
 				swapCities(&r.cities[i],&right.cities[ri]);
 
-
-				//r = twoOpt(r);
-				//right = twoOpt(right); // tODO: nie robic tego dwa razy
-
-
 				double after = getSingleRouteLength(r) + getSingleRouteLength(right);
 				if(bef < after){
 					swapCities(&r.cities[i],&right.cities[ri]);
-
-
-					//r = twoOpt(r);
-					//right = twoOpt(right); // tODO: nie robic tego dwa razy
-
 
 				}else{
 					gain += -after + bef;
@@ -88,9 +68,7 @@ br:			;
 		}
 	}while(gain > 0);
 
-	double af = getSingleRouteLength(r) + getSingleRouteLength(left) + getSingleRouteLength(right);
-
-	//printf("gained %3.3f\n",best-af);
+	//double af = getSingleRouteLength(r) + getSingleRouteLength(left) + getSingleRouteLength(right);
 }
 
 Solution twoOpt(Solution& s){

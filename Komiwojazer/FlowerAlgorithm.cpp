@@ -81,12 +81,15 @@ Solution Flower_ConstructSolution(int angleDisp, std::vector<m_Candidate> &candi
 
 int Flower_Optimize(Solution &s, CitiesData &cd, int i)
 {
+	
+	int sz = cd.count;
+
 	double totalGain;
 	do{
 		totalGain = 0.0;
 		double bef = getRoutesLength(s);
 
-		for (int szpara = 1; szpara <= cd.k; szpara++)
+		for (int szpara = 1; szpara <= sz; szpara++)
 		{
 			float gain;
 			do{
@@ -113,7 +116,7 @@ int Flower_Optimize(Solution &s, CitiesData &cd, int i)
 
 		double mid = getRoutesLength(s);
 
-		for (int szpara = cd.k; szpara > 0; szpara--)
+		for (int szpara = sz; szpara > 0; szpara--)
 		{
 			float gain;
 			do{
