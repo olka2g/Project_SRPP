@@ -4,7 +4,7 @@
 #include "AlgorithmController.h"
 
 // max iterations 1000 advised
-#define GRASP_MAX_ITERATIONS 500 /*1000*/
+#define GRASP_MAX_ITERATIONS 50 /*1000*/
 
 // inverse greediness
 #define GRASP_ALPHA 0.005
