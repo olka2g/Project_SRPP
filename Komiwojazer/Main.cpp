@@ -30,7 +30,7 @@ int main()
 		printf("\nTime elapsed: %3.3f s\n",((double)(end-start))/CLOCKS_PER_SEC);
 
 		//displayResultAnimated(solution);
-		displayResult(solution);
+		//displayResult(solution);
 
 
 		printf("\nCare for another round? Y/N\n");
