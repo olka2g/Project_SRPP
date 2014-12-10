@@ -71,6 +71,7 @@ Solution getNearestNeighbourSolution(const CitiesData& cities, int initialID /*=
 		insertRouteIn(initialSolution, cityBuffer, bufferCount);
 	}
 
+	free(area.cities);
 	return initialSolution;
 }
 

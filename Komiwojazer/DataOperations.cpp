@@ -156,19 +156,18 @@ void destroySolution(Solution& solution)
 	free(solution.routes);
 }
 
-Route getLongestRouteIn(const Solution& solution, int skipFirstLongest /*= 0*/)
+int RouteQuickSortComparison(const void * a, const void * b)
 {
-	float longestRouteLength = 0;
+	return (getSingleRouteLength(*(Route*)a)- getSingleRouteLength(*(Route*)b));
+}
+
+Route getLongestRouteIn(const Solution& solution, int skipFirstLongest)
+{
 	Route longestRoute;
 
-	for (int i = 0; i<solution.num_routes; i++)
-	{
-		if(longestRouteLength < getSingleRouteLength(solution.routes[i]))
-		{
-			longestRouteLength = getSingleRouteLength(solution.routes[i]);
-			longestRoute = solution.routes[i];
-		}
-	}
+	qsort(solution.routes, solution.num_routes, sizeof(Route), RouteQuickSortComparison);
+	longestRoute = solution.routes[solution.num_routes-1-skipFirstLongest];
+
 
 	return longestRoute;
 }

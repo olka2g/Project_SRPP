@@ -2,6 +2,9 @@
 #include "TwoOpt.h"
 #include "DataOperations.h"
 
+int TABU_DURATION_TIME;
+int NEIGHBOURHOOD_SIZE;
+
 /* Local data structures for the algorithm */
 typedef struct TabuItem
 {
@@ -46,7 +49,6 @@ SolutionCandidate swapCitiesIn(const Solution& solution, City city1, City city2)
 				routeID2 = i;
 			}
 		}
-		//TODO maybe - check if breaking the loop when found will work faster or not
 	}
 	
 	//check how many routes were changed (1 or 2) and save it in new solution candidate
@@ -67,29 +69,7 @@ SolutionCandidate swapCitiesIn(const Solution& solution, City city1, City city2)
 	return newSolution;
 }
 
-/* Generate solutionCandidates that will be solution's neighbourhood */
-void generateNeighbourhood(Solution& baseSolution, std::vector<SolutionCandidate>& neighbourhood, const CitiesData& area)
-{
- 	for (int i=0; i<neighbourhood.size(); i++)
- 	{
-		destroySolution(neighbourhood[i].solution);
-		//free(neighbourhood[i].modifiedRoutes);
-	}
-	neighbourhood.clear();
-
-	//find longest route in the solution and swap each of its cities with its neighbour
-	Route longest = getLongestRouteIn(baseSolution);
-	City neighbourCity;
-	
-	for (int i = 1; i< longest.num_cities-1; i++)
-	{
-		neighbourCity = getNeighbour(area, longest.cities[i]);
-		neighbourhood.push_back(swapCitiesIn(baseSolution, longest.cities[i], neighbourCity));
-	}
-}
-
-/* Defines if the candidate is taboo or not (if any of its changed routes is forbidden). 
-   TODO: aspiration function here. */
+/* Defines if the candidate is taboo or not (if any of its changed routes is forbidden). */
 bool isTabu(SolutionCandidate& candidate, std::vector<TabuItem>& tabuList)
 {
 	for (int i=0; i<tabuList.size(); i++)
@@ -102,6 +82,41 @@ bool isTabu(SolutionCandidate& candidate, std::vector<TabuItem>& tabuList)
 	}
 	
 	return false;
+}
+
+/* Generate solutionCandidates that will be solution's neighbourhood */
+void generateNeighbourhood(Solution& baseSolution, std::vector<SolutionCandidate>& neighbourhood, const CitiesData& area, std::vector<TabuItem>& tabuList)
+{
+ 	for (int i=0; i<neighbourhood.size(); i++)
+ 	{
+		destroySolution(neighbourhood[i].solution);
+			free(neighbourhood[i].modifiedRoutes);
+	}
+	neighbourhood.clear();
+
+
+	int j=0;
+	while (neighbourhood.size() < NEIGHBOURHOOD_SIZE && j<baseSolution.num_routes)
+	{
+		//find longest route in the solution and swap each of its cities with its neighbour
+		Route longest = getLongestRouteIn(baseSolution, j);
+		City neighbourCity;
+
+		for (int i = 1; i< longest.num_cities-1; i++)
+			{
+				neighbourCity = getNeighbour(area, longest.cities[i]);
+				SolutionCandidate candidate = swapCitiesIn(baseSolution, longest.cities[i], neighbourCity);
+				neighbourhood.push_back(candidate);
+			}
+		Route shortest = getLongestRouteIn(baseSolution,baseSolution.num_routes-1-j);
+		for (int i = 1; i< shortest.num_cities-1; i++)
+		{
+			neighbourCity = getNeighbour(area, shortest.cities[i]);
+			SolutionCandidate candidate = swapCitiesIn(baseSolution, shortest.cities[i], neighbourCity);
+			neighbourhood.push_back(candidate);
+		}
+		j++;
+	}
 }
 
 /* Finds best solution candidate from neighbourhood. */
@@ -138,7 +153,8 @@ void updateTabu(std::vector<TabuItem>& tabuList, SolutionCandidate& baseSolution
 		tabuList[i].iterationLeft--;
 	}
 
-	//use empty spaces in tabu list
+
+ 	//use empty spaces in tabu list
 	for (int i=0; i<tabuList.size(); i++)
 	{
 		if (tabuList[i].iterationLeft <= 0)
@@ -167,6 +183,9 @@ Solution Tabu_findPath(const CitiesData& cities)
 	int numberOfCycles = cities.count / TABU_CYCLE_INTERVAL;
 	Solution bestSolution;
 
+	TABU_DURATION_TIME = 2*cities.k;
+	NEIGHBOURHOOD_SIZE = 4*cities.k;
+
 	for (int cycle = 0; cycle<numberOfCycles; cycle++)
 	{
 		int i = 0;
@@ -187,7 +206,7 @@ Solution Tabu_findPath(const CitiesData& cities)
 
 		while(!shouldStop(i))
 		{
-			generateNeighbourhood(baseSolution, neighbourhood, cities);
+			generateNeighbourhood(baseSolution, neighbourhood, cities, tabuList);
 			baseSolutionCandidate = getBestSolution(neighbourhood, tabuList);
 			updateTabu(tabuList, baseSolutionCandidate);
 			bestSolution = getBetterSolution(baseSolutionCandidate.solution, bestSolution);
