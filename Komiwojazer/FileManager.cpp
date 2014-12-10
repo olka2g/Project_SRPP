@@ -1,15 +1,49 @@
 #include "FileManager.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
-#include <dos.h>
 
-char* chooseFile()
-{
-	return "data\\10_k=4";
+string chooseFile()
+{	
+	string folder = ".\\data\\";
+	vector<string> names;
+    char search_path[200];
+    sprintf(search_path, "%s*.*", folder.c_str());
+    WIN32_FIND_DATA fd; 
+    HANDLE hFind = ::FindFirstFile(search_path, &fd); 
+    if(hFind != INVALID_HANDLE_VALUE) 
+    { 
+        do 
+        { 
+            // read all (real) files in current folder
+            // , delete '!' read other 2 default folder . and ..
+            if(! (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ) 
+            {
+                names.push_back(fd.cFileName);
+            }
+        }while(::FindNextFile(hFind, &fd)); 
+        ::FindClose(hFind); 
+    } 
+
+	for(int i = 0; i < names.size();i++){
+		printf("%d. \t%s\n",i,names.at(i).c_str());
+	}
+	
+	string userInput;
+	int chosen = -1;
+	do{
+		printf("Choose file:\t");
+		getline(cin,userInput);
+		try{
+			chosen = stoi(userInput.c_str());
+		}catch(exception e){
+			chosen = -1;
+		}
+	}while(chosen >= names.size() || chosen < 0);
+
+	system("cls");
+
+	return folder + names.at(chosen);
 }
 
-CitiesData loadFile(char* filePath)
+CitiesData loadFile(string filePath)
 {
 	FILE* fr;
 	int n;
@@ -19,7 +53,7 @@ CitiesData loadFile(char* filePath)
 	CitiesData citiesData;
 	citiesData.count = 0;
 
-	fr = fopen (filePath, "rt");
+	fr = fopen (filePath.c_str(), "rt");
 
 	// Read first line - k
 	fgets(line, BUFF_SIZE, fr);

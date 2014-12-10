@@ -2,11 +2,40 @@
 #include <math.h>
 #include <vector>
 #include "FlowerAlgorithm.h"
+#include <string>
+using namespace std;
+#include <iostream>
 
 Solution findPath(CitiesData cities){
-	return Flower_findPath(cities);
-	//return GRASP_findPath(cities);
-	//return Tabu_findPath(cities);
+	printf("0.\tGRASP\n");
+	printf("1.\tTabu\n");
+	printf("2.\tGreedy Radial\n");
+
+	string userInput;
+	int chosen = -1;
+	do{
+		printf("Choose algorithm:\t");
+		getline(cin,userInput);
+		try{
+			chosen = stoi(userInput.c_str());
+		}catch(exception e){
+			chosen = -1;
+		}
+	}while(chosen >= 3 || chosen < 0);
+
+	system("cls");
+
+	switch (chosen)
+	{
+	case 0:
+		return GRASP_findPath(cities);
+	case 1:
+		return Tabu_findPath(cities);
+	case 2:
+		return Flower_findPath(cities);
+	default:
+		break;
+	}
 }
 
 #pragma region functions common for all algorithms
@@ -153,7 +182,7 @@ Solution getRandomSolution(CitiesData cd){
 		{
 			if(citiesLeft.empty())
 				break;
-			
+
 			// traso wylosuj sobie miasto
 			if(s.routes[i].num_cities < cd.k + 1){				
 				if(fastRandomInRange(0,100) > 50){

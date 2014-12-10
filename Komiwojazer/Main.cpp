@@ -2,11 +2,9 @@
 #include "DataTypes.h"
 #include "AlgorithmController.h"
 #include "Visualization.h"
-//
-//#include <stdio.h>
-//#include <math.h>
-//#include <time.h>
+#include <string>
 
+using namespace std;
 using namespace cimg_library;
 
 
@@ -15,23 +13,33 @@ int main()
 {
 	srand(clock());
 
-	char* path = chooseFile();
-	CitiesData citiesData = loadFile(path);
-	
-	createCitiesDisplay(citiesData);	
-		
-	clock_t start = clock();
-	Solution solution = findPath(citiesData);
-	clock_t end = clock();
+	while(true){
+		system("cls");
 
-	printResults(solution);
+		string path = chooseFile();
+		CitiesData citiesData = loadFile(path);
 
-	printf("\nTime elapsed: %3.3f s\n",((double)(end-start))/CLOCKS_PER_SEC);
+		createCitiesDisplay(citiesData);	
 
-	//displayResultAnimated(solution);
-	displayResult(solution);
+		clock_t start = clock();
+		Solution solution = findPath(citiesData);
+		clock_t end = clock();
 
-	//getchar();
+		printResults(solution);
+
+		printf("\nTime elapsed: %3.3f s\n",((double)(end-start))/CLOCKS_PER_SEC);
+
+		//displayResultAnimated(solution);
+		displayResult(solution);
+
+
+		printf("\nCare for another round? Y/N\n");
+		char r = getchar();
+		if(r == 'y' || r == 'Y') 
+			continue;
+		else 
+			break;
+	}
 
 	return 0;
 }
